@@ -1,0 +1,51 @@
+#! /usr/bin/env python3
+
+import sys
+import os.path
+from os import path
+import random
+
+#This program creates .atm and .bank files and performs madatory checks for init
+#The .atm and .bank files are in the form '<key> <iv> \n'
+#There are 50,000 of these key-iv pairs
+
+#Check user provides only one argument
+if len(sys.argv) != 2:
+	print('Usage:  init <filename>')
+	sys.exit(62)
+
+path_var = str(sys.argv[1])
+
+bank_path = path_var+'.bank'
+atm_path = path_var+'.atm'
+
+#Check that files to create don't already exist
+if path.isfile(bank_path) or path.isfile(atm_path):
+	print('Error: one of the files already exists')
+	sys.exit(63)
+
+#Create the .bank and .atm files
+try:
+	b = open(bank_path, 'a+')
+	a = open(atm_path, 'a+')
+except:
+	print('Error creating initialization files')
+	sys.exit(64)
+
+#Fill .bank and .atm files with identical symmetric key iv pairs like a key book
+for i in range(5000):
+	key_int = random.getrandbits(104)
+	key_str = str(key_int)
+	key_padded = key_str.zfill(32)
+	iv_int = random.getrandbits(52)
+	iv_str = str(iv_int)
+	iv_padded = iv_str.zfill(16)
+	#print(key_padded, iv_padded)
+	pair = key_padded+' '+iv_padded+'\n'
+	b.write(pair)
+	a.write(pair)
+
+b.close()
+a.close()
+print('Successfully initialized bank state')
+sys.exit(0)
